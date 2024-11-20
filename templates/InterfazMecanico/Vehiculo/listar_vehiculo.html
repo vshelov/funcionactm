@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listar Vehículos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: Arial, sans-serif;
+        }
+        .navbar-custom {
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+        .navbar-custom .navbar-brand, .navbar-custom .nav-link {
+            color: #c9d1d9;
+        }
+        .navbar-custom .nav-link:hover {
+            color: #58a6ff;
+        }
+        .btn-back {
+            background-color: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+        .btn-back:hover {
+            background-color: #30363d;
+            color: #58a6ff;
+        }
+        /* Estilo de la tabla */
+        .table-dark {
+            background-color: #161b22;
+        }
+        .table-dark th, .table-dark td {
+            color: #c9d1d9;
+            vertical-align: middle;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .table th, .table td {
+            padding: 8px 10px;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination .page-item {
+            margin: 0 5px;
+        }
+        .pagination .page-link {
+            color: #c9d1d9;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #58a6ff;
+            border-color: #58a6ff;
+        }
+        .pagination .page-item.disabled .page-link {
+            background-color: #21262d;
+            border-color: #30363d;
+            color: #6c757d;
+        }
+        /* Botones más compactos */
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .btn-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn-container .btn {
+            width: 48%;
+        }
+
+        /* Estilo del modal */
+        .modal-content {
+            background-color: #21262d;
+            color: #ffffff;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #30363d;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #30363d;
+        }
+
+        .modal-body {
+            color: #c9d1d9;
+        }
+
+        .modal-footer .btn {
+            color: #ffffff;
+            background-color: #58a6ff;
+            border-color: #58a6ff;
+        }
+
+        .modal-footer .btn-secondary {
+            background-color: #21262d;
+            border-color: #30363d;
+        }
+
+        .modal-footer .btn:hover {
+            background-color: #1f6feb;
+            border-color: #1f6feb;
+        }
+
+        .modal-footer .btn-secondary:hover {
+            background-color: #30363d;
+            border-color: #58a6ff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Taller Mecánico</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard_mecanico' %}">Panel Principal</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="text-center">Lista de Vehículos</h2>
+            <a href="{% url 'dashboard_mecanico' %}" class="btn btn-back">
+                <i class="bi bi-arrow-left"></i> Ir Atrás
+            </a>
+        </div>
+
+        <!-- Tabla Responsiva -->
+        <div class="table-responsive">
+            <table class="table table-dark table-striped mt-4">
+                <thead>
+                    <tr>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Patente</th>
+                        <th scope="col">Marca</th>
+                        <th scope="col">Modelo</th>
+                        <th scope="col">Año</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if vehiculos %}
+                        {% for vehiculo in vehiculos %}
+                        <tr>
+                            <td>{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</td>
+                            <td>{{ vehiculo.patente }}</td>
+                            <td>{{ vehiculo.marca }}</td>
+                            <td>{{ vehiculo.modelo }}</td>
+                            <td>{{ vehiculo.ano }}</td>
+                            <td>
+                                <a href="{% url 'modificar_vehiculo' vehiculo.patente %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Modificar
+                                </a>
+                                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ vehiculo.patente }}">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+
+                                <!-- Modal de Confirmación de Eliminación -->
+                                <div class="modal fade" id="deleteModal{{ vehiculo.patente }}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Está seguro de que desea eliminar el vehículo con patente <strong>{{ vehiculo.patente }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <form method="post" action="{% url 'eliminar_vehiculo' vehiculo.patente %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No hay vehículos registrados.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if page_obj.has_previous or page_obj.has_next %}
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><a class="page-link">Anterior</a></li>
+                {% endif %}
+                <li class="page-item active">
+                    <a class="page-link">{{ page_obj.number }}</a>
+                </li>
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><a class="page-link">Siguiente</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
