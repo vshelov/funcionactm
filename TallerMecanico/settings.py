@@ -141,3 +141,5 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'TallerMecanico.settings')
