@@ -1,1 +1,1 @@
-web: gunicorn TallerMecanico.wsgi
+web: python manage.py collectstatic && gunicorn TallerMecanico.wsgi
