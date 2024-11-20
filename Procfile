@@ -1,1 +1,1 @@
-web: gunicorn TallerMecanico.wsgigit remote -v
+web: gunicorn TallerMecanico.wsgi
